@@ -80,8 +80,8 @@ INSTALL_BOOTLOADER="refind"     # refind | grub
 # Desktop Environment (GUI)
 INSTALL_DE=(
     i3 dmenu
-    xfce xfce4-goodies
-    #gnome gnome-extras
+    xfce4 xfce4-goodies
+    #gnome gnome-extra
     #cinnamon
 )
 
@@ -109,7 +109,7 @@ PKG_GPU_INTEL=(
     vulkan-intel lib32-vulkan-intel
 )
 PKG_GPU_NVIDIA=(
-    nvidia nvidia-lts
+    nvidia nvidia-lts nvidia-dkms
     nvidia-utils lib32-nvidia-utils
     nvidia-settings
 )
@@ -433,6 +433,7 @@ Operation=Remove
 Type=Package
 Target=nvidia
 Target=nvidia-lts
+Target=nvidia-dkms
 Target=linux
 # Change the linux part above and in the Exec line if a different kernel is used
 
@@ -523,6 +524,7 @@ install_display_manager() {
         "gdm")
             systemctl enable gdm
         ;;
+    esac
 
     printf "\n>> Finished installing display manager!\n\n"
     prompt
