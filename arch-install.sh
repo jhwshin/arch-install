@@ -81,7 +81,7 @@ INSTALL_BOOTLOADER="refind"     # refind | grub
 INSTALL_DE=(
     i3 dmenu
     xfce4 xfce4-goodies
-    #gnome gnome-extra
+    gnome gnome-extra
     #cinnamon
 )
 
@@ -426,6 +426,8 @@ install_gpu_drivers() {
             nvidia-xconfig
 
             # pacman hook to rebuild initramfs when linux or nvidia updates
+            touch /etc/pacman.d/hooks/nvidia.hooks
+
             nvidia_systemd="[Trigger]
 Operation=Install
 Operation=Upgrade
@@ -434,7 +436,10 @@ Type=Package
 Target=nvidia
 Target=nvidia-lts
 Target=nvidia-dkms
+Target=nvidia-utils
+Target=lib32-nvidia-utils
 Target=linux
+Target=linux-lts
 # Change the linux part above and in the Exec line if a different kernel is used
 
 [Action]
@@ -446,6 +451,12 @@ Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /
 "
 
             printf "${nvidia_systemd}" > /etc/pacman.d/hooks/nvidia.hooks
+
+            # enable nvidia powersaving
+            systemctl enable nvidia-hibernate
+            systemctl enable nvidia-suspend
+            systemctl enable nvidia-resume
+            
         ;;
         # TODO: Virtual Machine
         # "vm")
@@ -562,7 +573,7 @@ dualboot_time_fix() {
 if [[ ${1} != "--chroot" ]]; then
 
     printf -- "\n======================================\n"
-    printf    "     STARTING ARCH INSTALLER..."
+    printf    "     STARTING ARCH INSTALLER...\n"
     printf -- "======================================\n"
 
     update_mirrors
@@ -571,7 +582,7 @@ if [[ ${1} != "--chroot" ]]; then
     start_chroot
 
     printf -- "\n======================================\n"
-    printf    "     FINISHED ARCH INSTALLER!"
+    printf    "     FINISHED ARCH INSTALLER!\n"
     printf -- "======================================\n"
 
 # # ======================================
