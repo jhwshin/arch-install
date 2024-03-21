@@ -263,8 +263,7 @@ setup_btrfs() {
     chattr +C /mnt/tmp
 
     # mount EFI partition
-    mkdir /mnt/boot/EFI
-    mount "${EFI_PARTITION}" /mnt/boot/EFI
+    mount "${EFI_PARTITION}" /mnt/boot
 
     # verify mounts
     ${DEBUG_MODE} && \
@@ -344,12 +343,12 @@ set_locale() {
     # set keymap
     cat > /etc/vconsole.conf << EOF
 KEYMAP=us
-FONT=Lat-Terminus16
+FONT=Lat2-Terminus16
 EOF
-
+#FIX
     # verify locale
     ${DEBUG_MODE} && \
-        localectl list-locales && \
+        # localectl list-locales && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
@@ -418,12 +417,13 @@ set_user() {
 edit_pacman() {
     echo ">> Edittin pacman.conf..."
 
+    #FIX
     # edit pacman.conf
     sed -i "s/^#UseSyslog/UseSyslog/"                   /etc/pacman.conf
     sed -i "s/^#Color/Color/"                           /etc/pacman.conf
-    sed -i "s/^#CheckSpace/CheckSpace"                  /etc/pacman.conf
-    sed -i "s/^#VerbosePkgLists/VerbosePkgLists"        /etc/pacman.conf
-    sed -i "s/^#ParallelDownloads/ParallelDownloads"    /etc/pacman.conf
+    sed -i "s/^#CheckSpace/CheckSpace/"                 /etc/pacman.conf
+    sed -i "s/^#VerbosePkgLists/VerbosePkgLists/"       /etc/pacman.conf
+    sed -i "s/^#ParallelDownloads/ParallelDownloads/"   /etc/pacman.conf
 
     # add 32-bit mirrors
     sed -i '/^#\[multilib\].*/,+1 s/^#//'               /etc/pacman.conf
@@ -493,6 +493,7 @@ EOF
                 nvidia-xconfig
 
                 # add nvidia hook
+                mkdir -p /etc/pacman.d/hooks
                 cat > /etc/pacman.d/hooks/nvidia.hook << EOF
 [Trigger]
 Operation=Install
@@ -526,7 +527,7 @@ EOF
 
                 # add to kernel parameter to preserve memory after suspend
                 cat > /etc/modprobe.d/nvidia-power-management.conf << EOF
-options nvidia NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath="/var/tmp
+options nvidia NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath=/var/tmp
 EOF
             ;;
 
@@ -614,7 +615,7 @@ menuentry "Arch Linux" {
     volume      "CRYPT_ROOT"
     loader      /vmlinuz-linux
     initrd      /initramfs-linux.img
-    options     "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/intel-ucode.img initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}"
+    options     "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}"
 
     submenuentry "Linux fallback initramfs" {
         loader  /vmlinuz-linux
@@ -651,7 +652,7 @@ EOF
 }
 
 misc_configs() {
-    echo ">> Setting up Reflector..."
+    echo ">> Setting iwd as Backend..."
 
     cat > /etc/NetworkManager/conf.d/wifi_backend.conf << EOF
 [device]
@@ -683,7 +684,7 @@ EOF
 setup_hooks() {
     echo ">> Setting up Systemd Hooks..."
 
-    mkdir /etc/pacman.d/hooks
+    mkdir -p /etc/pacman.d/hooks
 
     # sign kernel initramfs after every rebuild update
     cat > /etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook << EOF
