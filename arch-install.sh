@@ -730,10 +730,12 @@ quick_refind_fix() {
     CRYPT_UUID="$(lsblk -o NAME,UUID | grep ${ROOT_PARTITION#/dev/} | awk '{print $2}')"
     RESUME_OFFSET="$(btrfs inspect-internal map-swapfile -r /mnt/.swapvol/swapfile)"
 
+    # fbdev doesn't work in luks?
+    # nvidia_drm.fbdev=1
     if [[ ${GPU[@]} =~ "nvidia" ]]; then
         # check if modeset worked:
         # $ cat /sys/module/nvidia_drm/parameters
-        NVIDIA_KMS_PARAMETERS="nvidia_drm.modeset=1 nvidia_drm.fbdev=1"
+        NVIDIA_KMS_PARAMETERS="nvidia_drm.modeset=1"
     fi
 
     cat >> /mnt/boot/EFI/refind/refind.conf << EOF
