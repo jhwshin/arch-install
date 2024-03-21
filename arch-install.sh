@@ -185,7 +185,7 @@ setup_luks() {
         --perf-no_read_workqueue \
         --perf-no_write_workqueue \
         --type luks2 \
-        --cipher aex-xts-plain64 \
+        --cipher aes-xts-plain64 \
         --key-size 512 \
         --iter-time 2000 \
         --pbkdf argon2id \
@@ -196,7 +196,7 @@ setup_luks() {
 
     # open container with persistent options to save parameters
     cryptsetup \
-        --allow-discard \
+        --allow-discards \
         --perf-no_read_workqueue \
         --perf-no_write_workqueue \
         --persistent \
@@ -263,7 +263,8 @@ setup_btrfs() {
     chattr +C /mnt/tmp
 
     # mount EFI partition
-    mount "${EFI_PARTITION}" /mnt/boot
+    mkdir /mnt/boot/EFI
+    mount "${EFI_PARTITION}" /mnt/boot/EFI
 
     # verify mounts
     ${DEBUG_MODE} && \
@@ -299,7 +300,7 @@ update_mirrorlist() {
     # $ reflector --verbose --latest 200 --number 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 
     # get fastest mirrors (fast way)
-    reflector --country "${MIRROR_REGIONS}" --latest 10 --number 10 --sort rate --save /etc/pacman.d/mirrorlist
+    reflector --country "${MIRROR_REGIONS}" --verbose --latest 10 --number 10 --sort rate --save /etc/pacman.d/mirrorlist
 
     # verify mirrors
     ${DEBUG_MODE} && \

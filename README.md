@@ -2,11 +2,11 @@
 
 A simple Arch Linux installer script written for myself.
 
-Please be careful not to blindly run this script as they may not suit your needs and could break your system.
+I highly recommend you don't run this script as they may not suit your needs or your system, but rather use it as a reference or a guide.
 
-If you are unfamiliar with the arch install process please don't run this script.
+If you are unfamiliar with the arch install process then definitely don't run this script without carefully reading through the it.
 
-Back up your system first!!
+And as always, back up your system first!!
 
 ## Summary
 
@@ -42,6 +42,19 @@ Back up your system first!!
     - `shim` + `sbsigntools` - secure boot sign
     - `nvidia` - rebuild with kernel or nvidia driver updates
     - `zsh` - refresh cache
+</details>
+
+<details>
+<summary>How does it work?</summary>
+
+Basically condensed everything to a single file for simiplicity and portability.
+
+Setup the partition as per your needs and edit the variables in the config.
+
+You only need to run the script first which will execute the __'pre-chroot'__ part. 
+
+The script will then copy over itself to `/mnt` and `chroot` into it, and then finally run the __'chroot'__ part of the script. It will also clean itself up by removing the copied script in `/mnt` after the installation is complete.
+
 </details>
 
 ## Instructions
