@@ -600,49 +600,6 @@ install_bootloader() {
 
             refind-install
 
-            CRYPT_UUID="$(lsblk -o NAME,UUID | grep ${ROOT_PARTITION#/dev/} | awk '{print $2}')"
-            RESUME_OFFSET="$(btrfs inspect-internal map-swapfile -r /mnt/.swapvol/swapfile)"
-
-            if [[ ${GPU[@]} =~ "nvidia" ]]; then
-                # check if modeset worked:
-                # $ cat /sys/module/nvidia_drm/parameters
-                NVIDIA_KMS_PARAMETERS="nvidia_drm.modeset=1 nvidia_drm.fbdev=1"
-            fi
-
-            cat > /mnt/boot/EFI/refind/refind.conf << EOF
-menuentry "Arch Linux" {
-    icon        /EFI/refind/icons/os_arch.png
-    volume      "CRYPT_ROOT"
-    loader      /vmlinuz-linux
-    initrd      /initramfs-linux.img
-    options     "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}"
-
-    submenuentry "Linux fallback initramfs" {
-        loader  /vmlinuz-linux
-        initrd  /initramfs-linux-fallback.img
-    }
-    submenuentry "Boot to terminal" {
-        add_options "systemd.unit=multi-user.target"
-    }
-    submenuentry "Linux-lts" {
-        loader  /vmlinuz-linux-lts
-        initrd  /initramfs-linux-lts.img
-    }
-    submenuentry "Linux-lts fallback" {
-        loader  /vmlinuz-linux-lts
-        initrd  /initramfs-linux-lts-fallback.img
-    }
-    submenuentry "Linux-zen" {
-        loader  /vmlinuz-linux-zen
-        initrd  /initramfs-linux-zen.img
-    }
-    submenuentry "Linux-zen fallback" {
-        loader  /vmlinuz-linux-zen
-        initrd  /initramfs-linux-zen-fallback.img
-    }
-}
-EOF
-
             # verify refind configs
             ${DEBUG_MODE} && \
                 cat /boot/EFI/refind/refind.conf && \
@@ -769,6 +726,56 @@ rebuild_initramfs() {
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
+quick_refind_fix() {
+    CRYPT_UUID="$(lsblk -o NAME,UUID | grep ${ROOT_PARTITION#/dev/} | awk '{print $2}')"
+    RESUME_OFFSET="$(btrfs inspect-internal map-swapfile -r /mnt/.swapvol/swapfile)"
+
+    if [[ ${GPU[@]} =~ "nvidia" ]]; then
+        # check if modeset worked:
+        # $ cat /sys/module/nvidia_drm/parameters
+        NVIDIA_KMS_PARAMETERS="nvidia_drm.modeset=1 nvidia_drm.fbdev=1"
+    fi
+
+    cat >> /mnt/boot/EFI/refind/refind.conf << EOF
+menuentry "Arch Linux" {
+    icon        /EFI/refind/icons/os_arch.png
+    volume      "CRYPT_ROOT"
+    loader      /vmlinuz-linux
+    initrd      /initramfs-linux.img
+    options     "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}"
+
+    submenuentry "Linux fallback initramfs" {
+        loader  /vmlinuz-linux
+        initrd  /initramfs-linux-fallback.img
+    }
+    submenuentry "Boot to terminal" {
+        add_options "systemd.unit=multi-user.target"
+    }
+    submenuentry "Linux-lts" {
+        loader  /vmlinuz-linux-lts
+        initrd  /initramfs-linux-lts.img
+    }
+    submenuentry "Linux-lts fallback" {
+        loader  /vmlinuz-linux-lts
+        initrd  /initramfs-linux-lts-fallback.img
+    }
+    submenuentry "Linux-zen" {
+        loader  /vmlinuz-linux-zen
+        initrd  /initramfs-linux-zen.img
+    }
+    submenuentry "Linux-zen fallback" {
+        loader  /vmlinuz-linux-zen
+        initrd  /initramfs-linux-zen-fallback.img
+    }
+}
+EOF
+
+    # verify refind configs
+    ${DEBUG_MODE} && \
+        cat /mnt/boot/EFI/refind/refind.conf && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
 # ------------------------------------------------
 #   Main
 # ------------------------------------------------
@@ -803,6 +810,9 @@ main() {
 
         # clean up copied script once chroot functions are complete
         rm "/mnt/home/${SCRIPT_NAME}"
+
+        # since UUID isn't shown in chroot
+        quick_refind_fix
 
         exit
 
