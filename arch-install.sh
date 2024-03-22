@@ -221,7 +221,6 @@ setup_btrfs() {
     # create btrfs subvolumes
     btrfs subvolume create /mnt/@
     btrfs subvolume create /mnt/@home
-    btrfs subvolume create /mnt/@srv
 
     btrfs subvolume create /mnt/@snapshots
 
@@ -241,16 +240,15 @@ setup_btrfs() {
 
     mount -o noatime,nodiratime,compress=zstd:1,subvol=@            /dev/mapper/crypt   /mnt
     
-    mkdir -p /mnt/{boot,home,srv,.snapshots,tmp,.swapvol,btrfs}
+    mkdir -p /mnt/{home,.snapshots,tmp,.swapvol,.btrfsroot}
     mkdir -p /mnt/var/{log,cache,lib/libvirt/images}
 
     mount -o noatime,nodiratime,compress=zstd:1,subvol=@home        /dev/mapper/crypt   /mnt/home
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@srv         /dev/mapper/crypt   /mnt/srv
     mount -o noatime,nodiratime,compress=zstd:1,subvol=@snapshots   /dev/mapper/crypt   /mnt/.snapshots
     mount -o noatime,nodiratime,compress=zstd:1,subvol=@log         /dev/mapper/crypt   /mnt/var/log
     mount -o noatime,nodiratime,compress=zstd:1,subvol=@cache       /dev/mapper/crypt   /mnt/var/cache
     
-    mount -o noatime,nodiratime,compress=zstd:1,subvolid=5          /dev/mapper/crypt   /mnt/btrfs
+    mount -o noatime,nodiratime,compress=zstd:1,subvolid=5          /dev/mapper/crypt   /mnt/.btrfsroot
 
     # this may not work (nodatacow and datacow can't be on the same file system)
     # try instead set '$ chattr +C <PATH>'
@@ -263,6 +261,7 @@ setup_btrfs() {
     chattr +C /mnt/tmp
 
     # mount EFI partition
+    mkdir -p /mnt/boot
     mount "${EFI_PARTITION}" /mnt/boot
 
     # verify mounts
