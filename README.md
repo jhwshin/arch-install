@@ -13,14 +13,15 @@ And as always, back up your system first!!
 <details>
     <summary>What does this script include?</summary>
 
-- Dual Boot Compatible - `Windows` + `Linux`
+- Dual Boot Compatible - `Windows` (install first) + `Linux`
 - File System - `BTRFS` (CoW FS) on `LUKS` (Encryption)
-- Bootloader - `rEFIND` (Prettier, Mouse + Touchscreen Functional)
+- SWAP File + Hibernation
+- Bootloader - `rEFIND` (Mouse + Touchscreen Functional)
 - Secure Boot - `shim-signed` + `sbsigntools` (MOK Signed)
 - Kernel - `linux` + `linux-lts` + `linux-zen`
 - Drivers
-    - CPU - `intel`
-    - GPU - `intel` + `nvidia-dkms`
+    - CPU - `intel` (microcode)
+    - GPU - `intel` (igpu) + `nvidia-dkms`
 - Display Server - `X11`
 - Desktop Environment - `i3` + `xfce` + `gnome`
 - Applications
@@ -29,7 +30,6 @@ And as always, back up your system first!!
     - Network - `NetworkManager` + `iwd` (Backend)
     - AUR - `yay`
     - Other additional packages...
-- SWAP File + Hibernation
 - Configs
     - Locale - `/etc/locale.gen` + `/etc/local.conf`
     - Timezone - `/etc/localtime`
@@ -65,7 +65,7 @@ The script will then copy over itself to `/mnt` and `chroot` into it, and then f
 $ ls /sys/firmware/efi/efivars
 
 # remove residual NVRAM entries from past installs if required
-# $ rm -rf /sys/firmware/efi/efivars/Boot*
+$ rm -rf /sys/firmware/efi/efivars/Boot*
 ```
 
 2. Sync hardware clock:

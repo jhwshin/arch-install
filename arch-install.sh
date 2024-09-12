@@ -182,24 +182,24 @@ setup_luks() {
 
     # format luks with optimized configs for ssd encryption
     cryptsetup luksFormat \
+        --cipher aes-xts-plain64 \
+        --hash sha512 \
+        --use-random \
+        --key-size 512 \
+        --pbkdf argon2id \
+        --pbkdf-memory 1048576 \
+        --pbkdf-parallel 4 \
+        --iter-time 2000 \
+        --allow-discards \
         --perf-no_read_workqueue \
         --perf-no_write_workqueue \
         --type luks2 \
-        --cipher aes-xts-plain64 \
-        --key-size 512 \
-        --iter-time 2000 \
-        --pbkdf argon2id \
-        --hash sha3-512 \
         --label "CRYPT_ROOT" \
         --verbose \
         "${ROOT_PARTITION}"
 
-    # open container with persistent options to save parameters
+    # open container
     cryptsetup \
-        --allow-discards \
-        --perf-no_read_workqueue \
-        --perf-no_write_workqueue \
-        --persistent \
         --verbose \
         open "${ROOT_PARTITION}" crypt
 
@@ -238,17 +238,17 @@ setup_btrfs() {
 
     echo ">> Mounting partitions..."
 
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@            /dev/mapper/crypt   /mnt
+    mount -o noatime,nodiratime,compress=zstd:3,subvol=@            /dev/mapper/crypt   /mnt
     
     mkdir -p /mnt/{home,.snapshots,tmp,.swapvol,.btrfsroot}
     mkdir -p /mnt/var/{log,cache,lib/libvirt/images}
 
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@home        /dev/mapper/crypt   /mnt/home
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@snapshots   /dev/mapper/crypt   /mnt/.snapshots
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@log         /dev/mapper/crypt   /mnt/var/log
-    mount -o noatime,nodiratime,compress=zstd:1,subvol=@cache       /dev/mapper/crypt   /mnt/var/cache
+    mount -o noatime,nodiratime,compress=zstd:3,subvol=@home        /dev/mapper/crypt   /mnt/home
+    mount -o noatime,nodiratime,compress=zstd:3,subvol=@snapshots   /dev/mapper/crypt   /mnt/.snapshots
+    mount -o noatime,nodiratime,compress=zstd:3,subvol=@log         /dev/mapper/crypt   /mnt/var/log
+    mount -o noatime,nodiratime,compress=zstd:3,subvol=@cache       /dev/mapper/crypt   /mnt/var/cache
     
-    mount -o noatime,nodiratime,compress=zstd:1,subvolid=5          /dev/mapper/crypt   /mnt/.btrfsroot
+    mount -o noatime,nodiratime,compress=zstd:3,subvolid=5          /dev/mapper/crypt   /mnt/.btrfsroot
 
     # this may not work (nodatacow and datacow can't be on the same file system)
     # try instead set '$ chattr +C <PATH>'
@@ -514,7 +514,7 @@ Description=Update Nvidia module in initcpio
 Depends=mkinitcpio
 When=PostTransaction
 NeedsTargets
-Exec = /bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
+Exec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
 EOF
 
                 # enable power saving
