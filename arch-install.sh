@@ -190,7 +190,6 @@ setup_luks() {
         --pbkdf-memory 1048576 \
         --pbkdf-parallel 4 \
         --iter-time 2000 \
-        --allow-discards \
         --perf-no_read_workqueue \
         --perf-no_write_workqueue \
         --type luks2 \
@@ -200,6 +199,8 @@ setup_luks() {
 
     # open container
     cryptsetup \
+        --allow-discards \
+        --persistent \
         --verbose \
         open "${ROOT_PARTITION}" crypt
 
