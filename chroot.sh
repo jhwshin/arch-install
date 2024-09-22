@@ -164,7 +164,7 @@ install_gpu_drivers() {
 install_desktop_environments() {
     echo ">> Installing Desktop Environment..."
 
-    pacman -S ${DE[*]} --noconfirm
+    pacman -S ${DESKTOP_ENVIRONMENTS[*]} --noconfirm
 
     # copy over default xinitrc
     cp /etc/X11/xinit/xinitrc /home/${USERNAME}/.xinitrc

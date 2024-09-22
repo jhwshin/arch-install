@@ -94,7 +94,7 @@ BASE_PACKAGES=(
     btrfs-progs
     iwd
 )
-DESKTOP_ENVIRONMENT=(
+DESKTOP_ENVIRONMENTS=(
     i3
     dmenu
     xfce4
