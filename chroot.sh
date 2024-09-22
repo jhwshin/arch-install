@@ -10,7 +10,9 @@ set_locale() {
     echo "LANG=${LOCALE_SYSTEM}" > /etc/locale.conf
     echo "${VCONSOLE_CONF}" > /etc/vconsole.conf
 
-    verify "localectl list-locales"
+    ${INTERACTIVE_MODE} && \
+        localectl list-locales && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 set_timezone() {
@@ -22,7 +24,9 @@ set_timezone() {
     # sync hardware clock
     hwclock --systohc -v
 
-    verify "ls -l /etc/localtime"
+    ${INTERACTIVE_MODE} && \
+        ls -l /etc/localtime && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 set_hosts() {
@@ -30,7 +34,9 @@ set_hosts() {
 
     echo "${HOSTS_CONF}" > /etc/hosts
 
-    verify "cat /etc/hosts"
+    ${INTERACTIVE_MODE} && \
+        cat /etc/hosts && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 set_hostname() {
@@ -38,7 +44,9 @@ set_hostname() {
 
     echo "${HOSTNAME}" > /etc/hostname
 
-    verify "cat /etc/hostname"
+    ${INTERACTIVE_MODE} && \
+        cat /etc/hostname && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 set_users() {
@@ -53,7 +61,9 @@ set_users() {
     passwd ${USERNAME}      # set password for user
     passwd                  # set password for root
 
-    verify "cat /etc/sudoers && cat /etc/passwd"
+    ${INTERACTIVE_MODE} && \
+        cat /etc/sudoers && cat /etc/passwd && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 edit_pacman_conf() {
@@ -71,8 +81,11 @@ edit_pacman_conf() {
 
     # refresh pacman mirrors
     pacman -Sy
-    verify "cat /etc/pacman.conf | grep "# Misc options" -A 6 &&
-            cat /etc/pacman.conf | grep "\[multilib\]" -A 1"
+
+    ${INTERACTIVE_MODE} && \
+        cat /etc/pacman.conf | grep "# Misc options" -A 6 && \
+        cat /etc/pacman.conf | grep "\[multilib\]" -A 1 && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_cpu_microcode() {
@@ -88,7 +101,8 @@ install_cpu_microcode() {
         esac
     done
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_display_servers() {
@@ -96,7 +110,8 @@ install_display_servers() {
 
     pacman -S ${XORG_PACKAGES[*]} --noconfirm
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_gpu_drivers() {
@@ -133,7 +148,8 @@ install_gpu_drivers() {
         esac
     done
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_desktop_environments() {
@@ -155,7 +171,9 @@ install_desktop_environments() {
     # change owner of .xinitrc
     chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
     
-    verify "cat /home/${USERNAME}/.xinitrc"
+    ${INTERACTIVE_MODE} && \
+        cat /home/${USERNAME}/.xinitrc && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_basic_packages() {
@@ -163,7 +181,8 @@ install_basic_packages() {
 
     pacman -S ${ADDITIONAL_PACKAGES[*]} --noconfirm
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_aur() {
@@ -179,7 +198,8 @@ EOF
     # install AUR packages
     yay -Sy ${AUR_PACKAGES[*]} --noconfirm
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 install_bootloader() {
@@ -202,7 +222,9 @@ install_bootloader() {
 
             refind-install
 
-            verify "cat /boot/EFI/refind/refind.conf"
+        ${INTERACTIVE_MODE} && \
+            cat /boot/EFI/refind/refind.conf && \
+            printf "\nPress Enter to continue...\n\n"; read; clear
         ;;
     esac
 }
@@ -218,7 +240,6 @@ misc_configs() {
     echo ">> Pruning .snapshots in /etc/updatedb.conf..."
     # prevent snapshot slowdowns
     echo 'PRUNENAMES = ".snapshots"' >> /etc/updatedb.conf
-
 }
 
 pacman_hooks() {
@@ -234,7 +255,9 @@ pacman_hooks() {
     # refresh zsh
     echo "${ZSH_HOOK}" > "${HOOKS_DIR}/zsh.hook"
 
-    verify "ls -l ${HOOKS_DIR}"
+    ${INTERACTIVE_MODE} && \
+        ls -l ${HOOKS_DIR} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 systemd_units() {
@@ -242,7 +265,8 @@ systemd_units() {
 
     systemctl enable ${SYSTEMD_STARTUPS[*]}
 
-    verify ""
+    ${INTERACTIVE_MODE} && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
 build_initramfs() {
@@ -258,6 +282,8 @@ build_initramfs() {
     mkinitcpio -P
 
     # verify modules and hooks
-    verify "cat /etc/mkinitcpio.conf | grep '^MODULES=.*' && \
-            cat /etc/mkinitcpio.conf | grep '^HOOKS=.*' &&"
+    ${INTERACTIVE_MODE} && \
+        cat /etc/mkinitcpio.conf | grep '^MODULES=.*' && \
+        cat /etc/mkinitcpio.conf | grep '^HOOKS=.*' && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
 }
