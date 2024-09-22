@@ -10,7 +10,6 @@ setup_luks() {
         --pbkdf-parallel 4 \
         --iter-time 2000 \
         --cipher aes-xts-plain64 \
-        --allow-discards \
         --perf-no_read_workqueue \
         --perf-no_write_workqueue \
         --type luks2 \
@@ -19,6 +18,8 @@ setup_luks() {
         "${ROOT_PARTITION}"
 
     cryptsetup luksOpen \
+        --allow-discards \
+        --persistent \
         --verbose \
         "${ROOT_PARTITION}" crypt
 
