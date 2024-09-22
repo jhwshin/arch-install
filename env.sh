@@ -187,26 +187,26 @@ menuentry "Arch Linux" {
     options         "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw ${NVIDIA_KERNEL_PARAMS}"
 
 
-    submenuentry 'Linux fallback initramfs' {
+    submenuentry "Linux fallback initramfs" {
         loader  /vmlinuz-linux
         initrd  /initramfs-linux-fallback.img
     }
-    submenuentry 'Boot to terminal' {
-        add_options 'systemd.unit=multi-user.target'
+    submenuentry "Boot to terminal" {
+        add_options "systemd.unit=multi-user.target"
     }
-    submenuentry 'Linux-lts' {
+    submenuentry "Linux-lts" {
         loader  /vmlinuz-linux-lts
         initrd  /initramfs-linux-lts.img
     }
-    submenuentry 'Linux-lts fallback' {
+    submenuentry "Linux-lts fallback" {
         loader  /vmlinuz-linux-lts
         initrd  /initramfs-linux-lts-fallback.img
     }
-    submenuentry 'Linux-zen' {
+    submenuentry "Linux-zen" {
         loader  /vmlinuz-linux-zen
         initrd  /initramfs-linux-zen.img
     }
-    submenuentry 'Linux-zen fallback' {
+    submenuentry "Linux-zen fallback" {
         loader  /vmlinuz-linux-zen
         initrd  /initramfs-linux-zen-fallback.img
     }
