@@ -48,7 +48,6 @@ setup_btrfs() {
     btrfs su create /mnt/@docker
     btrfs su create /mnt/@libvirt
     btrfs su create /mnt/@swap
-    btrfs su create /mnt/@nocow
 
     verify "btrfs su list /mnt"
 
@@ -58,8 +57,7 @@ setup_btrfs() {
 
     mount -vo ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
 
-    mkdir -vp /mnt/{.snapshots,tmp,.swapvol,.btrfsroot}
-    mkdir -vp /mnt/home/${USERNAME}/.nocow
+    mkdir -vp /mnt/{home,.snapshots,tmp,.swapvol,.btrfsroot}
     mkdir -vp /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
 
     mount -vo ${MOUNT_OPTS},subvol=@home             /dev/mapper/crypt   /mnt/home
@@ -73,7 +71,6 @@ setup_btrfs() {
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@docker     /dev/mapper/crypt   /mnt/var/lib/docker
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@libvirt    /dev/mapper/crypt   /mnt/var/lib/libvirt/images
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@swap       /dev/mapper/crypt   /mnt/.swapvol
-    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@nocow      /dev/mapper/crypt   /mnt/home/${USERNAME}/.nocow
 
     chattr +C /mnt/tmp
     chattr +C /mnt/var/log
@@ -82,7 +79,6 @@ setup_btrfs() {
     chattr +C /mnt/var/lib/docker
     chattr +C /mnt/var/lib/libvirt/images
     chattr +C /mnt/.swapvol
-    chattr +C /mnt/home/${USERNAME}/.nocow
 
     mkdir -vp /mnt/boot
     mount "${EFI_PARTITION}" /mnt/boot
