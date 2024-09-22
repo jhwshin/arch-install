@@ -23,6 +23,7 @@ setup_luks() {
         --verbose \
         "${ROOT_PARTITION}" crypt
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cryptsetup luksDump ${ROOT_PARTITION} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -51,6 +52,7 @@ setup_btrfs() {
     btrfs su create /mnt/@libvirt
     btrfs su create /mnt/@swap
 
+    # verify
     ${INTERACTIVE_MODE} && \
         btrfs su list /mnt && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -87,6 +89,7 @@ setup_btrfs() {
     mkdir -vp /mnt/boot
     mount "${EFI_PARTITION}" /mnt/boot
 
+    # verify
     ${INTERACTIVE_MODE} && \
         findmnt -a | grep /mnt && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -96,6 +99,7 @@ setup_btrfs() {
     btrfs fi mkswapfile --size "${SWAPFILE_SIZE}" /mnt/.swapvol/swapfile
     swapon /mnt/.swapvol/swapfile
 
+    # verify
     ${INTERACTIVE_MODE} && \
         swapon -a && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -115,6 +119,7 @@ update_mirrorlist() {
         --sort rate \
         --save /etc/pacman.d/mirrorlist
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/pacman.d/mirrorlist && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -128,6 +133,7 @@ install_arch_base() {
     # generate fstab
     genfstab -U /mnt > /mnt/etc/fstab
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /mnt/etc/fstab && \
         printf "\nPress Enter to continue...\n\n"; read; clear

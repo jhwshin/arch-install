@@ -10,8 +10,9 @@ set_locale() {
     echo "LANG=${LOCALE_SYSTEM}" > /etc/locale.conf
     echo "${VCONSOLE_CONF}" > /etc/vconsole.conf
 
+    # verify
     ${INTERACTIVE_MODE} && \
-        localectl list-locales && \
+        #localectl list-locales && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
@@ -24,6 +25,7 @@ set_timezone() {
     # sync hardware clock
     hwclock --systohc -v
 
+    # verify
     ${INTERACTIVE_MODE} && \
         ls -l /etc/localtime && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -34,6 +36,7 @@ set_hosts() {
 
     echo "${HOSTS_CONF}" > /etc/hosts
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/hosts && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -44,6 +47,7 @@ set_hostname() {
 
     echo "${HOSTNAME}" > /etc/hostname
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/hostname && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -61,6 +65,7 @@ set_users() {
     passwd ${USERNAME}      # set password for user
     passwd                  # set password for root
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/sudoers && cat /etc/passwd && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -82,6 +87,7 @@ edit_pacman_conf() {
     # refresh pacman mirrors
     pacman -Sy
 
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/pacman.conf | grep "# Misc options" -A 6 && \
         cat /etc/pacman.conf | grep "\[multilib\]" -A 1 && \
@@ -101,6 +107,7 @@ install_cpu_microcode() {
         esac
     done
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -110,6 +117,7 @@ install_display_servers() {
 
     pacman -S ${XORG_PACKAGES[*]} --noconfirm
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -148,6 +156,7 @@ install_gpu_drivers() {
         esac
     done
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -170,7 +179,8 @@ install_desktop_environments() {
 
     # change owner of .xinitrc
     chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
-    
+
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /home/${USERNAME}/.xinitrc && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -181,6 +191,7 @@ install_basic_packages() {
 
     pacman -S ${ADDITIONAL_PACKAGES[*]} --noconfirm
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -198,6 +209,7 @@ EOF
     # install AUR packages
     yay -Sy ${AUR_PACKAGES[*]} --noconfirm
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -208,10 +220,10 @@ install_bootloader() {
     CRYPT_UUID="$(lsblk -o NAME,UUID | grep ${ROOT_PARTITION#/dev/} | awk '{print $2}')"
     RESUME_OFFSET="$(btrfs inspect-internal map-swapfile -r /mnt/.swapvol/swapfile)"
 
-    if [[ ${GPU[@]} =~ "nvidia" ]]; then
+    if [[ ! ${GPU[@]} =~ "nvidia" ]]; then
         # check if modeset worked:
         # $ cat /sys/module/nvidia_drm/parameters
-        NVIDIA_KMS_PARAMETERS=""
+        NVIDIA_KERNEL_PARAMS=""
     fi
 
     case ${BOOTLOADER} in
@@ -222,6 +234,13 @@ install_bootloader() {
 
             refind-install
 
+            echo ${REFIND_BOOT_ENTRY} >> /boot/EFI/refind/refind.conf
+
+            git clone https://github.com/jhwshin/refind-dreary /boot/EFI/refind
+            sh /boot/EFI/refindrefind-dreary/install.sh lowres /boot/EFI/refind
+            rm -rf /boot/EFI/refind/refind-dreary
+
+        # verify
         ${INTERACTIVE_MODE} && \
             cat /boot/EFI/refind/refind.conf && \
             printf "\nPress Enter to continue...\n\n"; read; clear
@@ -231,11 +250,11 @@ install_bootloader() {
 
 misc_configs() {
     echo ">> Setting iwd as Backend..."
-    echo "${NETWORK_MANAGER_CONFIG}" > "/etc/NetworkManager/conf.d/wifi_backend.conf"
+    echo "${NETWORK_MANAGER_CONF}" > "/etc/NetworkManager/conf.d/wifi_backend.conf"
 
     echo ">> Setting up Reflector..."
     mkdir -p /etc/xdg/reflector
-    echo "${REFLECTOR_CONFIG}" > "/etc/xdg/reflector/reflector.conf"
+    echo "${REFLECTOR_CONF}" > "/etc/xdg/reflector/reflector.conf"
 
     echo ">> Pruning .snapshots in /etc/updatedb.conf..."
     # prevent snapshot slowdowns
@@ -248,13 +267,14 @@ pacman_hooks() {
     HOOKS_DIR="/etc/pacman.d/hooks"
     mkdir -p ${HOOKS_DIR}
 
-    # required for secureboot
+    # hooks for secureboot
     echo "${MOKS_HOOK}" > "${HOOKS_DIR}/999-sign_kernel_for_secureboot.hook"
     echo "${REFIND_HOOK}" > "${HOOKS_DIR}/refind.hook"
 
-    # refresh zsh
+    # hooks zsh updates
     echo "${ZSH_HOOK}" > "${HOOKS_DIR}/zsh.hook"
 
+    # verify
     ${INTERACTIVE_MODE} && \
         ls -l ${HOOKS_DIR} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
@@ -265,6 +285,7 @@ systemd_units() {
 
     systemctl enable ${SYSTEMD_STARTUPS[*]}
 
+    # verify
     ${INTERACTIVE_MODE} && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
@@ -281,7 +302,7 @@ build_initramfs() {
     # rebuild initramfs
     mkinitcpio -P
 
-    # verify modules and hooks
+    # verify
     ${INTERACTIVE_MODE} && \
         cat /etc/mkinitcpio.conf | grep '^MODULES=.*' && \
         cat /etc/mkinitcpio.conf | grep '^HOOKS=.*' && \

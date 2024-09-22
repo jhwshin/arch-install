@@ -121,6 +121,7 @@ AUR_PACKAGES=(
 XORG_PACKAGES=(
     xorg
     xorg-apps
+    xorg-xinit
 )
 GPU_INTEL_PACKAGES=(
     xf86-video-intel
@@ -142,26 +143,19 @@ GPU_NVIDIA_PACKAGES=(
 #   CONFIGS
 # ------------------------------------------------
 
-VCONSOLE_CONF="
-KEYMAP=us
-FONT=Lat2-Terminus16
-"
+VCONSOLE_CONF="KEYMAP=us
+FONT=Lat2-Terminus16"
 
-HOSTS_CONF="
-127.0.0.1                                   localhost
+HOSTS_CONF="127.0.0.1                                   localhost
 ::1                                         localhost
-127.0.1.1       ${HOSTNAME}.localdomain     ${HOSTNAME}
-"
+127.0.1.1       ${HOSTNAME}.localdomain     ${HOSTNAME}"
 
-INTEL_XORG_CONF='
-# prevent screen tearing for intel
+INTEL_XORG_CONF='# prevent screen tearing for intel
 Section "Device"
     Identifier "Intel Graphics"
     Driver "intel"
     Option "TearFree" "true"
-EndSection
-'
-
+EndSection'
 
                 # add to kernel parameter to preserve memory after suspend
 #                 cat > /etc/modprobe.d/nvidia-power-management.conf << EOF
@@ -170,11 +164,11 @@ EndSection
 
 REFIND_BOOT_ENTRY="
 menuentry 'Arch Linux' {
-    icon        /EFI/refind/icons/os_arch.png
+    icon        /EFI/refind/themes/refind-dreary/icons/os_arch.png
     volume      'CRYPT_ROOT'
     loader      /vmlinuz-linux
     initrd      /initramfs-linux.img
-    options     'rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}'
+    options     'rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw ${NVIDIA_KERNEL_PARAMS}'
 
     submenuentry 'Linux fallback initramfs' {
         loader  /vmlinuz-linux
@@ -204,25 +198,20 @@ menuentry 'Arch Linux' {
 KERNEL_PARAMS=""
 NVIDIA_KERNEL_PARAMS="nvidia_drm.modeset=1 nvidia_drm.fbdev=1"
 
-NETWORK_MANAGER_CONFIG="
-[device]
-wifi.backend=iwd
-"
+NETWORK_MANAGER_CONF="[device]
+wifi.backend=iwd"
 
-REFLECTOR_CONF="
---country \"${MIRROR_REGIONS}\"
+REFLECTOR_CONF="--country \"${MIRROR_REGIONS}\"
 --latest 10
 --number 10
 --sort rate
---save /etc/pacman.d/mirrorlist
-"
+--save /etc/pacman.d/mirrorlist"
 
 # ------------------------------------------------
 #   PACMAN HOOKS
 # ------------------------------------------------
 
-NVIDIA_HOOK="
-[Trigger]
+NVIDIA_HOOK="[Trigger]
 Operation=Install
 Operation=Upgrade
 Operation=Remove
@@ -232,61 +221,56 @@ Target=nvidia-lts
 Target=nvidia-dkms
 Target=nvidia-utils
 Target=lib32-nvidia-utils
-Target = linux
-Target = linux-lts
-Target = linux-hardened
-Target = linux-zen
+Target=linux
+Target=linux-lts
+Target=linux-hardened
+Target=linux-zen
 
 [Action]
 Description=Update Nvidia module in initcpio
 Depends=mkinitcpio
 When=PostTransaction
 NeedsTargets
-Exec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
-"
+Exec=/bin/sh -c 'while read -r trg; do case \$trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'"
 
 # secure boot hooks
-MOKS_HOOK="
-[Trigger]
-Operation = Install
-Operation = Upgrade
-Type = Package
-Target = linux
-Target = linux-lts
-Target = linux-hardened
-Target = linux-zen
+MOKS_HOOK="[Trigger]
+Operation=Install
+Operation=Upgrade
+Type=Package
+Target=linux
+Target=linux-lts
+Target=linux-hardened
+Target=linux-zen
+Target=linux-surface
 
 [Action]
-Description = Signing kernel with Machine Owner Key for Secure Boot
-When = PostTransaction
-Exec = /usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>/dev/null | /usr/bin/grep -q \"signature certificates\"; then /usr/bin/sbsign --key /etc/refind.d/keys/refind_local.key --cert /etc/refind.d/keys/refind_local.crt --output {} {}; fi';
-Depends = sbsigntools
-Depends = findutils
-Depends = grep
-"
+Description=Signing kernel with Machine Owner Key for Secure Boot
+When=PostTransaction
+Exec=/usr/bin/find /boot/ -maxdepth 1 -name 'vmlinuz-*' -exec /usr/bin/sh -c 'if ! /usr/bin/sbverify --list {} 2>/dev/null | /usr/bin/grep -q \"signature certificates\"; then /usr/bin/sbsign --key /etc/refind.d/keys/refind_local.key --cert /etc/refind.d/keys/refind_local.crt --output {} {}; fi';
+Depends=sbsigntools
+Depends=findutils
+Depends=grep"
 
-REFIND_HOOK="
-[Trigger]
+REFIND_HOOK="[Trigger]
+Operation=Install
 Operation=Upgrade
 Type=Package
 Target=refind
 
 [Action]
-Description = Updating rEFInd on ESP
+Description=Updating rEFInd on ESP
 When=PostTransaction
-Exec=/usr/bin/refind-install --shim /usr/share/shim-signed/shimx64.efi --localkeys
-"
+Exec=/usr/bin/refind-install --shim /usr/share/shim-signed/shimx64.efi --localkeys"
 
-ZSH_HOOK="
-[Trigger]
-Operation = Install
-Operation = Upgrade
-Operation = Remove
-Type = Path
-Target = usr/bin/*
+ZSH_HOOK="[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Path
+Target=usr/bin/*
 
 [Action]
-Depends = zsh
-When = PostTransaction
-Exec = /usr/bin/install -Dm644 /dev/null /var/cache/zsh/pacman
-"
+Depends=zsh
+When=PostTransaction
+Exec=/usr/bin/install -Dm644 /dev/null /var/cache/zsh/pacman"

@@ -7,12 +7,6 @@ source "${SCRIPT_DIR}/env.sh"
 source "${SCRIPT_DIR}/chroot.sh"
 source "${SCRIPT_DIR}/pre-chroot.sh"
 
-verify() {
-    "${INTERACTIVE_MODE}" && \
-        $1 && \
-        printf "\nPress Enter to continue...\n\n"; read; clear
-}
-
 main() {
 
     if [[ $# -eq 0 ]]; then
