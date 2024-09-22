@@ -58,8 +58,8 @@ setup_btrfs() {
 
     mount -o ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
 
-    mkdir -p /mnt/{home,home/${USERNAME}/.nocow,.snapshots,tmp,.swapvol,.btrfsroot}
-    mkdir -p /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
+    mkdir -vp /mnt/{home,home/${USERNAME}/.nocow,.snapshots,tmp,.swapvol,.btrfsroot}
+    mkdir -vp /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
 
     mount -o ${MOUNT_OPTS},subvol=@home             /dev/mapper/crypt   /mnt/home
     mount -o ${MOUNT_OPTS},subvol=@snapshots        /dev/mapper/crypt   /mnt/.snapshots
@@ -83,7 +83,7 @@ setup_btrfs() {
     chattr +C /mnt/.swapvol
     chattr +C /mnt/home/${USERNAME}/.nocow
 
-    mkdir -p /mnt/boot
+    mkdir -vp /mnt/boot
     mount "${EFI_PARTITION}" /mnt/boot
 
     verify "findmnt -a | grep /mnt"
