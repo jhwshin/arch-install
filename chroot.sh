@@ -235,12 +235,28 @@ install_bootloader() {
             refind-install
 
             cat >> /mnt/boot/EFI/refind/refind.conf << EOF
+# Global Settings
+timeout 10                          #   [-1, 0, 0+] (skip, no timeout, x seconds)
+log_level 0                         #   [0-4]
+#enable_touch
+#enable_mouse
+#dont_scan_volumes "<LABEL>"        #   Prevent duplicate non-custom Linux entries using <LABEL> use e2label to label partition
+                                    #   or for LUKS cryptsetup config /dev/<sdXY> --label <LABEL>
+default_selection +                 #   Microsoft, Arch, + (most recently boot)
+resolution max
+
+# UI Settings
+# hideui banner, label, singleuser, arrows, hints, editor, badges
+hideui singleuser, arrows, label
+# shell, memtest, mok_tool, hidden_tags, shutdown, reboot, firmware
+showtools mok_tool, hidden_tags, reboot, shutdown, firmware
+
 menuentry "Arch Linux" {
-    icon        /EFI/refind/icons/os_arch.png
-    volume      "CRYPT_ROOT"
-    loader      /vmlinuz-linux
-    initrd      /initramfs-linux.img
-    options     "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw initrd=/initramfs-linux.img ${NVIDIA_KMS_PARAMETERS}"
+    icon            /EFI/refind/themes/refind-dreary/icons/os_arch.png
+    volume          "CRYPTROOT"
+    loader          /vmlinuz-linux
+    initrd          /initramfs-linux.img
+    options         "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw ${NVIDIA_KERNEL_PARAMS}"
 
     submenuentry "Linux fallback initramfs" {
         loader  /vmlinuz-linux
@@ -291,7 +307,7 @@ misc_configs() {
     echo ">> Pruning .snapshots in /etc/updatedb.conf..."
     # prevent snapshot slowdowns
     echo 'PRUNENAMES = ".snapshots"' >> /etc/updatedb.conf
-}s
+}
 
 pacman_hooks() {
     echo ">> Setting up Systemd Hooks..."
