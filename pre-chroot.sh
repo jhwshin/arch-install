@@ -56,23 +56,23 @@ setup_btrfs() {
 
     echo ">> Mounting BTRFS subvols..."
 
-    mount -o ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
+    mount -vo ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
 
     mkdir -vp /mnt/{home,home/${USERNAME}/.nocow,.snapshots,tmp,.swapvol,.btrfsroot}
     mkdir -vp /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
 
-    mount -o ${MOUNT_OPTS},subvol=@home             /dev/mapper/crypt   /mnt/home
-    mount -o ${MOUNT_OPTS},subvol=@snapshots        /dev/mapper/crypt   /mnt/.snapshots
+    mount -vo ${MOUNT_OPTS},subvol=@home             /dev/mapper/crypt   /mnt/home
+    mount -vo ${MOUNT_OPTS},subvol=@snapshots        /dev/mapper/crypt   /mnt/.snapshots
 
-    mount -o ${MOUNT_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
+    mount -vo ${MOUNT_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
 
-    mount -o ${MOUNT_OPTS},subvol=@var_log          /dev/mapper/crypt   /mnt/var/log
-    mount -o ${MOUNT_OPTS},subvol=@var_cache        /dev/mapper/crypt   /mnt/var/cache
-    mount -o ${MOUNT_OPTS},subvol=@var_tmp          /dev/mapper/crypt   /mnt/var/tmp
-    mount -o ${NOCOW_MOUNT_OPTS},subvol=@docker     /dev/mapper/crypt   /mnt/var/lib/docker
-    mount -o ${NOCOW_MOUNT_OPTS},subvol=@libvirt    /dev/mapper/crypt   /mnt/var/lib/libvirt/images
-    mount -o ${NOCOW_MOUNT_OPTS},subvol=@swap       /dev/mapper/crypt   /mnt/.swapvol
-    mount -o ${NOCOW_MOUNT_OPTS},subvol=@nocow      /dev/mapper/crypt   /mnt/home/${USERNAME}/.nocow
+    mount -vo ${MOUNT_OPTS},subvol=@var_log          /dev/mapper/crypt   /mnt/var/log
+    mount -vo ${MOUNT_OPTS},subvol=@var_cache        /dev/mapper/crypt   /mnt/var/cache
+    mount -vo ${MOUNT_OPTS},subvol=@var_tmp          /dev/mapper/crypt   /mnt/var/tmp
+    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@docker     /dev/mapper/crypt   /mnt/var/lib/docker
+    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@libvirt    /dev/mapper/crypt   /mnt/var/lib/libvirt/images
+    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@swap       /dev/mapper/crypt   /mnt/.swapvol
+    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@nocow      /dev/mapper/crypt   /mnt/home/${USERNAME}/.nocow
 
     chattr +C /mnt/tmp
     chattr +C /mnt/var/log
