@@ -58,7 +58,8 @@ setup_btrfs() {
 
     mount -vo ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
 
-    mkdir -vp /mnt/{home,home/${USERNAME}/.nocow,.snapshots,tmp,.swapvol,.btrfsroot}
+    mkdir -vp /mnt/{.snapshots,tmp,.swapvol,.btrfsroot}
+    mkdir -vp /mnt/home/${USERNAME}/.nocow
     mkdir -vp /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
 
     mount -vo ${MOUNT_OPTS},subvol=@home             /dev/mapper/crypt   /mnt/home
