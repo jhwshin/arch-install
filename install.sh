@@ -9,7 +9,7 @@ source "${SCRIPT_DIR}/pre-chroot.sh"
 
 verify() {
     "${INTERACTIVE_MODE}" && \
-        "$1" && \
+        $1 && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
 
