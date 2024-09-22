@@ -30,7 +30,7 @@ resolution max
 
 # UI Settings
 # hideui banner, label, singleuser, arrows, hints, editor, badges
-hideui singleuser, arrows, label
+hideui singleuser, hints, badges
 # shell, memtest, mok_tool, hidden_tags, shutdown, reboot, firmware
 showtools mok_tool, hidden_tags, reboot, shutdown, firmware
 
