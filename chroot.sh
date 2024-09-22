@@ -234,7 +234,7 @@ install_bootloader() {
 
             refind-install
 
-            cat >> /mnt/boot/EFI/refind/refind.conf << EOF
+            cat >> /boot/EFI/refind/refind.conf << EOF
 # Global Settings
 timeout 10                          #   [-1, 0, 0+] (skip, no timeout, x seconds)
 log_level 0                         #   [0-4]
