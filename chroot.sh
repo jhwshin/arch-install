@@ -234,9 +234,58 @@ install_bootloader() {
 
             refind-install
 
-            echo ${REFIND_BOOT_ENTRY} >> /boot/EFI/refind/refind.conf
+            cat >> /mnt/boot/EFI/refind/refind.conf << EOF
+# Global Settings
+timeout 10                          #   [-1, 0, 0+] (skip, no timeout, x seconds)
+log_level 0                         #   [0-4]
+#enable_touch
+#enable_mouse
+#dont_scan_volumes "<LABEL>"      #   Prevent duplicate non-custom Linux entries using <LABEL> use e2label to label partition
+                                    #   or for LUKS cryptsetup config /dev/<sdXY> --label <LABEL>
+default_selection +                 #   Microsoft, Arch, + (most recently boot)
+resolution max
 
-            git clone https://github.com/jhwshin/refind-dreary /boot/EFI/refind
+# UI Settings
+# hideui banner, label, singleuser, arrows, hints, editor, badges
+hideui singleuser, arrows, label
+# shell, memtest, mok_tool, hidden_tags, shutdown, reboot, firmware
+showtools mok_tool, hidden_tags, reboot, shutdown, firmware
+
+menuentry "Arch Linux" {
+    icon            /EFI/refind/themes/refind-dreary/icons/os_arch.png
+    volume          "CRYPTROOT"
+    loader          /vmlinuz-linux
+    initrd          /initramfs-linux.img
+    options         "rd.luks.name=${CRYPT_UUID}=crypt root=/dev/mapper/crypt rootflags=subvol=@ resume=/dev/mapper/crypt resume_offset=${RESUME_OFFSET} rw ${NVIDIA_KERNEL_PARAMS}"
+
+
+    submenuentry "Linux fallback initramfs" {
+        loader  /vmlinuz-linux
+        initrd  /initramfs-linux-fallback.img
+    }
+    submenuentry "Boot to terminal" {
+        add_options "systemd.unit=multi-user.target"
+    }
+    submenuentry "Linux-lts" {
+        loader  /vmlinuz-linux-lts
+        initrd  /initramfs-linux-lts.img
+    }
+    submenuentry "Linux-lts fallback" {
+        loader  /vmlinuz-linux-lts
+        initrd  /initramfs-linux-lts-fallback.img
+    }
+    submenuentry "Linux-zen" {
+        loader  /vmlinuz-linux-zen
+        initrd  /initramfs-linux-zen.img
+    }
+    submenuentry "Linux-zen fallback" {
+        loader  /vmlinuz-linux-zen
+        initrd  /initramfs-linux-zen-fallback.img
+    }
+}
+EOF
+
+            git clone https://github.com/jhwshin/refind-dreary /boot/EFI/refind/refind-dreary
             sh /boot/EFI/refindrefind-dreary/install.sh lowres /boot/EFI/refind
             rm -rf /boot/EFI/refind/refind-dreary
 
@@ -259,7 +308,7 @@ misc_configs() {
     echo ">> Pruning .snapshots in /etc/updatedb.conf..."
     # prevent snapshot slowdowns
     echo 'PRUNENAMES = ".snapshots"' >> /etc/updatedb.conf
-}
+}s
 
 pacman_hooks() {
     echo ">> Setting up Systemd Hooks..."
