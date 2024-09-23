@@ -226,7 +226,7 @@ install_bootloader() {
             refind-install
 
             git clone https://github.com/jhwshin/refind-dreary /boot/EFI/refind/refind-dreary
-            sh /boot/EFI/refindrefind-dreary/install.sh lowres /boot/EFI/refind
+            sh /boot/EFI/refind/refind-dreary/install.sh lowres /boot/EFI/refind
             rm -rf /boot/EFI/refind/refind-dreary
 
         # verify
