@@ -37,7 +37,6 @@ main() {
         exit
 
         echo "******** Arch Install Completed! ********"
-    fi
 
     elif [[ ${1} == "--chroot" ]]; then
         echo ">> Starting chroot..."
