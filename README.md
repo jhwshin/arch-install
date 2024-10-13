@@ -81,7 +81,7 @@ $ lsblk
 # verbose disk list
 $ fdisk -l
 
-# setup root partition and EFI (if not dual booting)
+# setup gpt, root partition and EFI (if not dual booting)
 # install script will create luks and btrfs
 $ fdisk /dev/<sdX>
 

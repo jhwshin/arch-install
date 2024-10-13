@@ -7,6 +7,12 @@ source "${SCRIPT_DIR}/chroot.sh"
 source "${SCRIPT_DIR}/pre-chroot.sh"
 source "${SCRIPT_DIR}/hooks.sh"
 
+setup_refind_theme() {
+    git clone https://github.com/jhwshin/refind-dreary /mnt/boot/EFI/refind/refind-dreary
+    sh /mnt/boot/EFI/refind/refind-dreary/install.sh lowres /mnt/boot/EFI/refind
+    rm -rf /mnt/boot/EFI/refind/refind-dreary
+}
+
 main() {
     if [[ $# -eq 0 ]]; then
         echo "******** Starting Arch Install... ********"
@@ -29,7 +35,7 @@ main() {
         cp -rv "${SCRIPT_DIR}" /mnt/home
         arch-chroot /mnt sh "/home/arch-install/${SCRIPT_NAME}" --chroot
 
-        #refind?
+        setup_refind_theme
 
         # clean up install script files
         rm -r "/mnt/home/arch-install/"
