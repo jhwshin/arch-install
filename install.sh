@@ -9,7 +9,7 @@ source "${SCRIPT_DIR}/hooks.sh"
 
 setup_refind_theme() {
     git clone https://github.com/jhwshin/refind-dreary /mnt/boot/EFI/refind/refind-dreary
-    sh /mnt/boot/EFI/refind/refind-dreary/install.sh lowres /mnt/boot/EFI/refind
+    sh /mnt/boot/EFI/refind/refind-dreary/install.sh lowres /mnt/boot/EFI/refind ${ROOT_PARTITION}
     rm -rf /mnt/boot/EFI/refind/refind-dreary
 }
 
