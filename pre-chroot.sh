@@ -117,7 +117,7 @@ setup_btrfs() {
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@docker     /dev/mapper/crypt   /mnt/var/lib/docker
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@libvirt    /dev/mapper/crypt   /mnt/var/lib/libvirt/images
     mount -vo ${NOCOW_MOUNT_OPTS},subvol=@swap       /dev/mapper/crypt   /mnt/.swapvol
-    # mount -vo ${NOCOW_MOUNT_OPTS},subvol=@nocow      /dev/mapper/crypt   /mnt/home/${USERNAME}/.nocow
+    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@nocow      /dev/mapper/crypt   /mnt/home/${USERNAME}/.nocow
 
     # set nocow
     chattr +C /mnt/var/log
@@ -126,7 +126,7 @@ setup_btrfs() {
     chattr +C /mnt/var/lib/docker
     chattr +C /mnt/var/lib/libvirt/images
     chattr +C /mnt/.swapvol
-    # chattr +C /mnt/home/${USERNAME}/.nocow
+    chattr +C /mnt/home/${USERNAME}/.nocow
 
     # mount boot
     mkdir -vp /mnt/boot
