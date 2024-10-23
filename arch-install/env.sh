@@ -27,6 +27,12 @@ GPU=(
 
 BOOTLOADER="refind"
 
+SYSTEMD_STARTUPS=(
+    NetworkManager
+    bluetooth
+    reflector
+)
+
 # ------------------------------------------------
 #   Packages
 # ------------------------------------------------
@@ -83,6 +89,24 @@ DESKTOP_ENVIRONMENTS=(
     xfce4-goodies
     gnome
     gnome-extra
+)
+
+BASIC_PACKAGES=(
+    alsa-utils                  # audio
+    pavucontrol                 # audio
+    networkmanager              # internet
+    network-manager-applet      # internet
+    bluez                       # bluetooth
+    bluez-utils                 # bluetooth
+    blueman                     # bluetooth
+    openssh
+    reflector                   # mirror
+)
+
+AUR_PACKAGES=(
+    firefox                     # web browser
+    kitty                       # terminal
+    mpv                         # media player
 )
 
 # ------------------------------------------------

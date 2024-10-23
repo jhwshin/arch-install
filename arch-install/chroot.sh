@@ -201,3 +201,34 @@ install_desktop_environments() {
         cat /home/${USERNAME}/.xinitrc && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+install_basic_packages() {
+    echo ">> Installing Basic Packages..."
+
+    pacman -S ${BASIC_PACKAGES[*]} --noconfirm
+
+    # enable auto startup
+    systemctl enable ${SYSTEMD_STARTUPS[*]}
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+install_aur_packages() {
+    echo ">> Installing AUR..."
+
+    su - ${USERNAME} << EOF
+cd && git clone https://aur.archlinux.org/yay
+cd yay && makepkg -si --noconfirm
+cd .. && rm -rf yay
+exit
+EOF
+
+    # install AUR packages
+    yay -Sy ${AUR_PACKAGES[*]} --noconfirm
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
