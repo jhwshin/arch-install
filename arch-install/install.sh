@@ -40,6 +40,7 @@ main() {
         set_hosts
         set_hostname
         set_users
+        edit_pacman_conf
 
         echo ">> Finished chroot!"
     fi

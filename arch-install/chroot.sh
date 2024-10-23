@@ -69,3 +69,26 @@ set_users() {
         cat /etc/sudoers && cat /etc/passwd && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+edit_pacman_conf() {
+    echo ">> Editing pacman.conf..."
+
+    # edit pacman.conf
+    sed -i "s/^#UseSyslog/UseSyslog/"                   /etc/pacman.conf
+    sed -i "s/^#Color/Color/"                           /etc/pacman.conf
+    sed -i "s/^#CheckSpace/CheckSpace/"                 /etc/pacman.conf
+    sed -i "s/^#VerbosePkgLists/VerbosePkgLists/"       /etc/pacman.conf
+    sed -i "s/^#ParallelDownloads/ParallelDownloads/"   /etc/pacman.conf
+
+    # add 32-bit mirrors
+    sed -i '/^#\[multilib\].*/,+1 s/^#//'               /etc/pacman.conf
+
+    # refresh pacman mirrors
+    pacman -Sy
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/pacman.conf | grep "# Misc options" -A 6 && \
+        cat /etc/pacman.conf | grep "\[multilib\]" -A 1 && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
