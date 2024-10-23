@@ -176,3 +176,28 @@ install_bootloader() {
         ;;
     esac
 }
+
+install_desktop_environments() {
+    echo ">> Installing Desktop Environment..."
+
+    pacman -S ${DESKTOP_ENVIRONMENTS[*]} --noconfirm
+
+    # copy over default xinitrc
+    cp /etc/X11/xinit/xinitrc /home/${USERNAME}/.xinitrc
+
+    # comment out xorg and xorg-apps
+    sed -i '/^twm .*/,+4 s/^/#/' /home/${USERNAME}/.xinitrc
+
+    # add another de to run with 'startx'
+    printf "\nexec i3\n" >> /home/${USERNAME}/.xinitrc
+    echo "#exec xfce4-session" >> /home/${USERNAME}/.xinitrc
+    echo "#exec gnome-session" >> /home/${USERNAME}/.xinitrc
+
+    # change owner of .xinitrc
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /home/${USERNAME}/.xinitrc && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}

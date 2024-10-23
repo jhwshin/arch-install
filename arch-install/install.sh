@@ -47,6 +47,7 @@ main() {
         install_display_servers
         install_gpu_drivers
         install_bootloader
+        install_desktop_environments
 
         echo ">> Finished chroot!"
     fi

@@ -76,6 +76,15 @@ GPU_NVIDIA_PACKAGES=(
     nvtop
 )
 
+DESKTOP_ENVIRONMENTS=(
+    i3
+    dmenu
+    xfce4
+    xfce4-goodies
+    gnome
+    gnome-extra
+)
+
 # ------------------------------------------------
 #   CONFIGS
 # ------------------------------------------------
