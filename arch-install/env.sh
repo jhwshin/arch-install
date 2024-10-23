@@ -17,6 +17,10 @@ LOCALE_SYSTEM="en_AU.UTF-8"         # $ less /etc/locale.gen
 TIMEZONE_REGION="Australia"         # $ ls /usr/share/zoneinfo/<REGION>/<CITY>
 TIMEZONE_CITY="Sydney"
 
+CPU=(
+    "intel"
+)
+
 # ------------------------------------------------
 #   Packages
 # ------------------------------------------------

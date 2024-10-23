@@ -92,3 +92,21 @@ edit_pacman_conf() {
         cat /etc/pacman.conf | grep "\[multilib\]" -A 1 && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+install_cpu_microcode() {
+    echo ">> Installing CPU Microcode..."
+
+    for cpu in ${CPU[@]}; do
+        case ${cpu} in
+            "intel")
+                echo ">> Installing Intel CPU drivers..."
+
+                pacman -S intel-ucode --noconfirm
+            ;;
+        esac
+    done
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}

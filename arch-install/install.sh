@@ -42,6 +42,9 @@ main() {
         set_users
         edit_pacman_conf
 
+        # install packages
+        install_cpu_microcode
+
         echo ">> Finished chroot!"
     fi
 }
