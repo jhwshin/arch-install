@@ -44,6 +44,8 @@ main() {
 
         # install packages
         install_cpu_microcode
+        install_display_servers
+        install_gpu_drivers
 
         echo ">> Finished chroot!"
     fi

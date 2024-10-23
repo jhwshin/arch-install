@@ -110,3 +110,45 @@ install_cpu_microcode() {
     "${INTERACTIVE_MODE}" && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+install_display_servers() {
+    echo ">> Installing Display Server..."
+
+    pacman -S ${XORG_PACKAGES[*]} --noconfirm
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+install_gpu_drivers() {
+    echo ">> Installing GPU drivers..."
+
+    for gpu in ${GPU[@]}; do
+        case ${gpu} in
+            "intel")
+                echo ">> Installing Intel GPU drivers..."
+
+                pacman -S ${GPU_INTEL_PACKAGES[*]} --noconfirm
+
+                echo "${INTEL_XORG_CONF}" > "/etc/X11/xorg.conf.d/20-intel.conf"
+            ;;
+            "nvidia")
+                echo ">> Installing Nvidia GPU drivers..."
+                
+                pacman -S ${GPU_NVIDIA_PACKAGES[*]} --noconfirm
+
+                # generate nvidia xorg
+                nvidia-xconfig
+
+                # add nvidia hook
+                mkdir -p /etc/pacman.d/hooks
+                echo "${NVIDIA_HOOK}" > "/etc/pacman.d/hooks/nvidia.hook"
+            ;;
+        esac
+    done
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
