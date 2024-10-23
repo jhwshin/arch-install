@@ -126,3 +126,38 @@ setup_btrfs() {
         swapon -a && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+update_mirrorlist() {
+    echo ">> Updating mirrors..."
+
+    # backup mirrorlist incase
+    cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+
+    # find fastest mirrors
+    reflector \
+        --country "${MIRROR_REGIONS}" \
+        --verbose \
+        --latest 10 \
+        --number 10 \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/pacman.d/mirrorlist && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+install_arch_base() {
+    echo ">> Installing Arch Base..."
+
+    pacstrap /mnt/ ${BASE_PACKAGES[*]} --noconfirm
+
+    # generate fstab
+    genfstab -U /mnt > /mnt/etc/fstab
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /mnt/etc/fstab && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
