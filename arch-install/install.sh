@@ -16,6 +16,7 @@ main() {
 
         # pre-chroot
         setup_luks
+        setup_btrfs
 
         # start chroot
         cp -rv "${SCRIPT_DIR}" /mnt/home
