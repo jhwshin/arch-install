@@ -53,3 +53,15 @@ Target=refind
 Description=Updating rEFInd on ESP
 When=PostTransaction
 Exec=/usr/bin/refind-install --shim /usr/share/shim-signed/shimx64.efi --localkeys"
+
+ZSH_HOOK="[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Path
+Target=usr/bin/*
+
+[Action]
+Depends=zsh
+When=PostTransaction
+Exec=/usr/bin/install -Dm644 /dev/null /var/cache/zsh/pacman"

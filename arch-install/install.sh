@@ -51,6 +51,8 @@ main() {
         install_basic_packages
         install_aur_packages
 
+        misc_configs
+
         echo ">> Finished chroot!"
     fi
 }

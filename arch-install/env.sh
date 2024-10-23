@@ -123,3 +123,9 @@ Section "Device"
     Driver "intel"
     Option "TearFree" "true"
 EndSection'
+
+REFLECTOR_CONF="--country '${MIRROR_REGIONS}'
+--latest 10
+--number 10
+--sort rate
+--save /etc/pacman.d/mirrorlist"

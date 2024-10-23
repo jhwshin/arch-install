@@ -232,3 +232,21 @@ EOF
     "${INTERACTIVE_MODE}" && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+misc_configs() {
+    echo ">> Setting up Reflector..."
+    mkdir -p /etc/xdg/reflector
+    echo "${REFLECTOR_CONF}" > "/etc/xdg/reflector/reflector.conf"
+
+    # prevent btrfs snapshot slowdowns
+    echo ">> Pruning .snapshots in /etc/updatedb.conf..."
+    echo 'PRUNENAMES = ".snapshots"' >> /etc/updatedb.conf
+
+    # hooks zsh updates
+    echo ">> Setting up ZSH hooks..."
+    echo "${ZSH_HOOK}" > "/etc/pacman.d/hooks/zsh.hook"
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
