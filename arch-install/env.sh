@@ -5,6 +5,9 @@ EFI_PARTITION="/dev/sda1"
 ROOT_PARTITION=""                   # e.g /dev/sda2
 SWAPFILE_SIZE="9G"                  # RAM_SIZE + 1G
 
+USERNAME="USER"
+HOSTNAME="ARCH"
+
 MIRROR_REGIONS="AU,NZ"              # $ reflector --list-countries
 LOCALE_GEN=(
     "en_AU.UTF-8 UTF-8"
@@ -39,3 +42,11 @@ BASE_PACKAGES=(
     ntfs-3g
     iwd
 )
+
+# ------------------------------------------------
+#   CONFIGS
+# ------------------------------------------------
+
+HOSTS_CONF="127.0.0.1                                   localhost
+::1                                         localhost
+127.0.1.1       ${HOSTNAME}.localdomain         ${HOSTNAME}"

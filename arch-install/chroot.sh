@@ -29,3 +29,43 @@ set_timezone() {
         ls -l /etc/localtime && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+set_hosts() {
+    echo ">> Setting up hosts..."
+
+    echo "${HOSTS_CONF}" > /etc/hosts
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/hosts && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+set_hostname() {
+    echo ">> Setting up hostname..."
+
+    echo "${HOSTNAME}" > /etc/hostname
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/hostname && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+set_users() {
+    echo ">> Adding users..."
+
+    # add users with zsh as default shell
+    useradd -m -G wheel -s /usr/bin/zsh "${USERNAME}"
+
+    # add wheel group to sudoers
+    EDITOR="sed -i '/^# %wheel ALL=(ALL:ALL) ALL/ s/^# //'" visudo
+
+    passwd "${USERNAME}"    # set password for user
+    passwd                  # set password for root
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/sudoers && cat /etc/passwd && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}

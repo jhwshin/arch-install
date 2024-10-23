@@ -37,6 +37,9 @@ main() {
         # set basic configuration
         set_locale
         set_timezone
+        set_hosts
+        set_hostname
+        set_users
 
         echo ">> Finished chroot!"
     fi
