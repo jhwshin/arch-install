@@ -152,3 +152,27 @@ install_gpu_drivers() {
     "${INTERACTIVE_MODE}" && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+install_bootloader() {
+    echo ">> Installing Bootloader..."
+
+    case ${BOOTLOADER} in
+        "refind")
+            echo ">> Installing rEFIND Bootloader..."
+
+            pacman -S refind --noconfirm
+
+            refind-install
+
+            # hooks for secureboot
+            mkdir -p /etc/pacman.d/hooks
+            echo "${MOKS_HOOK}" > "/etc/pacman.d/hooks/999-sign_kernel_for_secureboot.hook"
+            echo "${REFIND_HOOK}" > "/etc/pacman.d/hooks/refind.hook"
+
+        # verify
+        "${INTERACTIVE_MODE}" && \
+            cat /boot/EFI/refind/refind.conf && \
+            printf "\nPress Enter to continue...\n\n"; read; clear
+        ;;
+    esac
+}
