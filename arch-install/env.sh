@@ -33,6 +33,32 @@ SYSTEMD_STARTUPS=(
     reflector
 )
 
+MODULES=(
+    i915                    # intel keyboard
+    usbhid                  # usb3 hub via luks
+    xhci_hcd                # usb3 hub via luks
+    # nvidia
+    # nvidia_modeset
+    # nvidia_uvm
+    # nvidia_drm
+)
+HOOKS=(
+    base
+    systemd
+    # autodetect
+    microcode
+    modconf
+    kms
+    keyboard
+    sd-vconsole
+    block
+    sd-encrypt
+    # lvm2
+    filesystems
+    resume
+    fsck
+)
+
 # ------------------------------------------------
 #   Packages
 # ------------------------------------------------

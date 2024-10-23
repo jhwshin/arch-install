@@ -250,3 +250,22 @@ misc_configs() {
     "${INTERACTIVE_MODE}" && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
+
+build_initramfs() {
+    echo ">> Rebuilding Initramfs..."
+
+    # replace MODULES array
+    sed -i "s/^MODULES=.*/MODULES=( ${MODULES[*]} )/" /etc/mkinitcpio.conf
+
+    # replace HOOKS array
+    sed -i "s/^HOOKS=.*/HOOKS=( ${HOOKS[*]} )/" /etc/mkinitcpio.conf
+
+    # rebuild initramfs
+    mkinitcpio -P
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        cat /etc/mkinitcpio.conf | grep '^MODULES=.*' && \
+        cat /etc/mkinitcpio.conf | grep '^HOOKS=.*' && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}

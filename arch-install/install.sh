@@ -52,6 +52,7 @@ main() {
         install_aur_packages
 
         misc_configs
+        build_initramfs
 
         echo ">> Finished chroot!"
     fi
