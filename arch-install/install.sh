@@ -4,6 +4,7 @@ SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 
 source "${SCRIPT_DIR}/env.sh"
 source "${SCRIPT_DIR}/live.sh"
+source "${SCRIPT_DIR}/chroot.sh"
 
 main() {
     if [[ $# -eq 0 ]]; then
@@ -33,7 +34,9 @@ main() {
     elif
         echo ">> Starting chroot..."
 
-        # ...
+        # set basic configuration
+        set_locale
+        set_timezone
 
         echo ">> Finished chroot!"
     fi
