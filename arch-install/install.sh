@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 SCRIPT_NAME=$(basename $0)
 SCRIPT_PATH=$(realpath $0)
 SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
@@ -5,6 +7,7 @@ SCRIPT_DIR=$(dirname "${SCRIPT_PATH}")
 source "${SCRIPT_DIR}/env.sh"
 source "${SCRIPT_DIR}/live.sh"
 source "${SCRIPT_DIR}/chroot.sh"
+source "${SCRIPT_DIR}/hooks.sh"
 
 main() {
     if [[ $# -eq 0 ]]; then
@@ -26,12 +29,13 @@ main() {
         arch-chroot /mnt sh "/home/arch-install/${SCRIPT_NAME}" --chroot
 
         # post-chroot
+        setup_refind_entries_theme
 
         # clean up
         rm -rv "/mnt/home/arch-install"
 
         echo "******** Arch Install Completed! ********"
-    elif
+    elif [[ ${1} == "--chroot" ]]; then
         echo ">> Starting chroot..."
 
         # set basic configuration

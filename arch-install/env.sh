@@ -8,6 +8,21 @@ SWAPFILE_SIZE="9G"                  # RAM_SIZE + 1G
 USERNAME="USER"
 HOSTNAME="ARCH"
 
+GPU=(
+    "intel"
+    # "nvidia"
+)
+
+MODULES=(
+    i915                    # intel keyboard
+    usbhid                  # usb3 hub via luks
+    xhci_hcd                # usb3 hub via luks
+    # nvidia
+    # nvidia_modeset
+    # nvidia_uvm
+    # nvidia_drm
+)
+
 MIRROR_REGIONS="AU,NZ"              # $ reflector --list-countries
 LOCALE_GEN=(
     "en_AU.UTF-8 UTF-8"
@@ -20,10 +35,6 @@ TIMEZONE_CITY="Sydney"
 CPU=(
     "intel"
 )
-GPU=(
-    "intel"
-    # "nvidia"
-)
 
 BOOTLOADER="refind"
 
@@ -33,15 +44,6 @@ SYSTEMD_STARTUPS=(
     reflector
 )
 
-MODULES=(
-    i915                    # intel keyboard
-    usbhid                  # usb3 hub via luks
-    xhci_hcd                # usb3 hub via luks
-    # nvidia
-    # nvidia_modeset
-    # nvidia_uvm
-    # nvidia_drm
-)
 HOOKS=(
     base
     systemd
@@ -83,6 +85,7 @@ BASE_PACKAGES=(
     btrfs-progs
     ntfs-3g
     iwd
+    # lvm2
 )
 
 XORG_PACKAGES=(

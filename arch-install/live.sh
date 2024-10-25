@@ -156,8 +156,32 @@ install_arch_base() {
     # generate fstab
     genfstab -U /mnt > /mnt/etc/fstab
 
+    # quick dirty fix to fstab
+    # remove subvolid from all (except btrfsroot where subvolid=5)
+    sed -i 's/subvolid=[0-46-9][0-9]*//g' /mnt/etc/fstab
+
     # verify
     "${INTERACTIVE_MODE}" && \
         cat /mnt/etc/fstab && \
+        printf "\nPress Enter to continue...\n\n"; read; clear
+}
+
+setup_refind_entries_theme() {
+    echo ">> Installing Arch Base..."
+
+    CRYPT_UUID="$(lsblk -o NAME,UUID | grep ${ROOT_PARTITION#/dev/} | awk '{print $2}')"
+    RESUME_OFFSET="$(btrfs inspect-internal map-swapfile -r /mnt/.swapvol/swapfile)"
+
+    if [[ "${GPU[@]}" =~ 'nvidia' ]]; then
+        NVIDIA_KERNEL_PARAMS=true
+    fi
+
+    git clone https://github.com/jhwshin/refind-dreary /mnt/boot/EFI/refind/refind-dreary
+    sh /mnt/boot/EFI/refind/refind-dreary/install.sh lowres /mnt/boot/EFI/refind ${CRYPT_UUID} ${RESUME_OFFSET} ${NVIDIA_KERNEL_PARAMS}
+    rm -rf /mnt/boot/EFI/refind/refind-dreary
+
+    # verify
+    "${INTERACTIVE_MODE}" && \
+        tail -n 70 /mnt/boot/EFI/refind/refind.conf && \
         printf "\nPress Enter to continue...\n\n"; read; clear
 }
