@@ -10,43 +10,51 @@ And as always, back up your system first!!
 
 <details>
     <summary>What does this script include?</summary>
-    - Dual Boot Compatible - `Windows` + `Linux`
-    - Filesystem - `BTRFS` (CoW FS) on `LUKS` (Encryption)
-    - SWAP File + Hibernation
-    - Bootloader - `rEFIND` + `refind-dreary` theme
-    - Secure Boot - `shim-signed` + `sbsigntools` (using MOKS)
-    - Kernel - `linux` + `linux-lts` + `linux-zen`
-    - Drivers
-        - CPU - `intel`
-        - GPU - `intel` + `nvidia-dkms`
-    - Display Server - `X11`
-    - Desktop Environment - `i3` + `xfce` + `gnome`
-    - Applications
-        - Audio - `alsa` + `pulseaudio` + `pavucontrol`
-        - Bluetooth - `bluez` + `blueman`
-        - Network - `NetworkManager` + `iwd`
-        - AUR - `yay`
-        - Other additional packages...
-    - Configs
-        - Locale - `/etc/locale.gen` + `/etc/local.conf`
-        - Timezone - `/etc/localtime`
-        - Hosts - `/etc/hosts`
-        - Hostname - `/etc/hostname`
-        - Users + Sudoers
-        - Pacman + 32-bit Mirrors - `/etc/pacman.conf`
-        - Reflector Mirrors - `/etc/reflector`
+
+- Dual Boot Compatible - `Windows` + `Linux`
+- Filesystem - `BTRFS` (CoW FS) on `LUKS` (Encryption)
+- SWAP File + Hibernation
+- Bootloader - `rEFIND` + `refind-dreary` theme
+- Secure Boot - `shim-signed` + `sbsigntools` (using MOKS)
+- Kernel - `linux` + `linux-lts` + `linux-zen`
+- Drivers
+    - CPU - `intel`
+    - GPU - `intel` + `nvidia-dkms`
+- Display Server - `X11`
+- Desktop Environment - `i3` + `xfce` + `gnome`
+- Applications
+    - Audio - `alsa` + `pulseaudio` + `pavucontrol`
+    - Bluetooth - `bluez` + `blueman`
+    - Network - `NetworkManager` + `iwd`
+    - AUR - `yay`
+    - Other additional packages...
+- Configs
+    - Locale - `/etc/locale.gen` + `/etc/local.conf`
+    - Timezone - `/etc/localtime`
+    - Hosts - `/etc/hosts`
+    - Hostname - `/etc/hostname`
+    - Users + Sudoers
+    - Pacman + 32-bit Mirrors - `/etc/pacman.conf`
+    - Reflector Mirrors - `/etc/reflector`
+
 </details>
 
 <details>
 <summary>How does it work?</summary>
 
-Basically condensed everything to a single file for simiplicity and portability.
+Setup filesystem as per your needs.
+By default it wont create EFI (assumes dual boot on same drive)
+Setup BTRFS on LUKS
 
-Setup the partition as per your needs and edit the variables in the config.
+Edit variable in `env.sh` and hooks in `hooks.sh`
+Functions outside of chroot are located in `live.sh`
+Whilst functions in chroot are located in `chroot.sh`
 
-You only need to run the `__install.sh__` script first part. 
+When you run `install.sh` it will source from all those files above and execute them accordingly.
 
-The script will then copy over itself to `/mnt` and `chroot` into it, and then finally run the `__chroot.sh__` part of the script. It will also clean itself up by removing the copied script in `/mnt` after the installation is complete.
+After prechroot (live) part, the script will then copy over itself to `/mnt` and `chroot` into it, and then finally run the `chroot.sh` functions.
+It will also clean itself up by removing the copied script in `/mnt` after the installation is complete.
+
 </details>
 
 ## Instructions
