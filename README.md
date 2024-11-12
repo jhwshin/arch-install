@@ -57,6 +57,14 @@ It will also clean itself up by removing the copied script in `/mnt` after the i
 
 </details>
 
+## Update Notes
+
+- nvidia 565.x and 560.x [FAIL]
+  - fails with luks password prompt
+- nvidia 555.x [WORKING]
+  - early kms modules fail (don't add them in mkinitcpio)
+  - enable nvidia-{hibernate,suspend} __NOT__ nvidia-resume
+
 ## Instructions
 
 1. Verify system is running on EFI:
