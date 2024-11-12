@@ -13,7 +13,7 @@ main() {
     if [[ $# -eq 0 ]]; then
         echo "******** Starting Arch Install... ********"
 
-        if [[ ${ROOT_PARTITION} ]]; then
+        if [[ -z ${ROOT_PARTITION} ]]; then
             echo ">> ROOT_PARTITION in env.sh must not be empty! EXITING..."
             exit
         fi

@@ -158,7 +158,7 @@ install_arch_base() {
 
     # quick dirty fix to fstab
     # remove subvolid from all (except btrfsroot where subvolid=5)
-    sed -i 's/subvolid=[0-46-9][0-9]*//g' /mnt/etc/fstab
+    sed -i 's/subvolid=[0-46-9][0-9]*,//g' /mnt/etc/fstab
 
     # verify
     "${INTERACTIVE_MODE}" && \

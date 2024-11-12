@@ -87,7 +87,7 @@ $ fdisk -l
 $ fdisk /dev/<sdX>
 
 # if not dual booting
-# $ mkfs.vfat -F -n "EFI" /dev/<sdXY>
+# $ mkfs.vfat -F32 -n "EFI" /dev/<sdXY>
 ```
 
 4. Connect to WiFi:
