@@ -59,11 +59,19 @@ It will also clean itself up by removing the copied script in `/mnt` after the i
 
 ## Update Notes
 
-- nvidia 565.x and 560.x [FAIL]
+- nvidia `565.x` and `560.x` - __[FAIL]__
   - fails with luks password prompt
-- nvidia 555.x [WORKING]
-  - early kms modules fail (don't add them in mkinitcpio)
+
+- nvidia `555.58.02-1` - __[ALL WORKING]__
   - enable nvidia-{hibernate,suspend} __NOT__ nvidia-resume
+  - enable gdm
+  - add kernel params
+    - `nvidia-drm.modeset=1`
+    - `nvidia.NVreg_PreserveVideoMemoryAllocations=0`
+    - `nvidia.NVreg_TemporaryFilePath=/var/tmp`
+
+- nvidia below `545.x` - __[FAIL]__
+  - older drivers use gcc 13, newer uses gcc 14
 
 ## Instructions
 
