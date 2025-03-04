@@ -62,28 +62,28 @@ HOOKS=(
     fsck
 )
 
-BTRFS_SU_ROOT="@"
+COW_ROOT="@"
 
-BTRFS_SWAP_NAME="@swap"
-BTRFS_SWAP_MNT="/.swapvol"
+SWAP_NAME="@swap"
+SWAP_MNT="/.swapvol"
 
-BTRFS_SU_COW_NAME=(
+COW_NAME=(
     @home
     @snapshots
 )
-BTRFS_SU_COW_MNT=(
+COW_MNT=(
     /home
     /.snapshots
 )
 
-BTRFS_SU_NOCOW_NAME=(
+NOCOW_NAME=(
     @var_log
     @var_cache
     @var_tmp
     @docker
     @libvirt
 )
-BTRFS_SU_NOCOW_MNT=(
+NOCOW_MNT=(
     /var/log
     /var/cache
     /var/tmp
@@ -91,8 +91,8 @@ BTRFS_SU_NOCOW_MNT=(
     /var/lib/libvirt/images
 )
 
-BTRFS_COW_MNT_OPTS="noatime,nodiratime,compress=zstd:3"
-BTRFS_NOCOW_MNT_OPTS="noatime,nodiratime,compress=no"
+COW_OPTS="noatime,nodiratime,compress=zstd:3"
+NOCOW_OPTS="noatime,nodiratime,compress=no"
 
 # ------------------------------------------------
 #   Packages

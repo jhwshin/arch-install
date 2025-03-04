@@ -47,15 +47,15 @@ setup_btrfs() {
 
     mount /dev/mapper/crypt /mnt
 
-    btrfs su create /mnt/${BTRFS_SU_ROOT}
+    btrfs su create /mnt/${COW_ROOT}
 
     # create subvols for cow
-    for subvol in "${BTRFS_SU_COW_NAME[@]}"; do
+    for subvol in "${COW_NAME[@]}"; do
         btrfs su create /mnt/${subvol}
     done
 
     # create subvols for nocow
-    for subvol in "${BTRFS_SU_NOCOW_NAME[@]}"; do
+    for subvol in "${NOCOW_NAME[@]}"; do
         btrfs su create /mnt/${subvol}
     done
 
@@ -70,7 +70,7 @@ setup_btrfs() {
     umount /mnt
 
     # mount root
-    mount -vo ${BTRFS_COW_MNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
+    mount -vo ${COW_OPTS},subvol=${COW_ROOT} /dev/mapper/crypt /mnt
 
     # create dir for btrfsroot
     mkdir -vp /mnt/.btrfsroot
@@ -79,24 +79,24 @@ setup_btrfs() {
     mount -vo ${MOUNT_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
 
     # cow subvols
-    for i in "${!BTRFS_SU_COW_NAME[@]}"; do
+    for i in "${!COW_NAME[@]}"; do
         # make dir
-        mkdir -vp /mnt${BTRFS_SU_COW_MNT[$i]}
+        mkdir -vp /mnt${COW_MNT[$i]}
 
         # mount
-        mount -vo ${BTRFS_COW_MNT_OPTS},subvol=${BTRFS_SU_COW_NAME[$i]} /dev/mapper/crypt /mnt${BTRFS_COW_MNT[$i]}
+        mount -vo ${COW_OPTS},subvol=${COW_NAME[$i]} /dev/mapper/crypt /mnt${COW_MNT[$i]}
     done
     
     # nocow subvols
-    for i in "${!BTRFS_SU_NOCOW_NAME[@]}"; do
+    for i in "${!NOCOW_NAME[@]}"; do
         # make dir
-        mkdir -vp /mnt${BTRFS_SU_NOCOW_MNT[$i]}
+        mkdir -vp /mnt${NOCOW_MNT[$i]}
 
         # mount
-        mount -vo ${BTRFS_NOCOW_MNT_OPTS},subvol=${BTRFS_SU_NOCOW_NAME[$i]} /dev/mapper/crypt /mnt${BTRFS_NOCOW_MNT[$i]}
+        mount -vo ${NOCOW_OPTS},subvol=${NOCOW_NAME[$i]} /dev/mapper/crypt /mnt${NOCOW_MNT[$i]}
 
         # set no cow
-        chattr +C /mnt${BTRFS_NOCOW_MNT[$i]}
+        chattr +C /mnt${NOCOW_MNT[$i]}
     done
 
     # mount boot
@@ -112,11 +112,11 @@ setup_btrfs() {
     echo ">> Setting up SWAP file..."
 
     # create swapfile in swap subvol
-    mkdir -vp /mnt${BTRFS_SWAP_MNT}
-    mount -vo ${BTRFS_NOCOW_MNT_OPTS},subvol=${BTRFS_SWAP_NAME} /dev/mapper/crypt /mnt${BTRFS_SWAP_MNT}
-    chattr +C /mnt${BTRFS_SWAP_MNT}
-    btrfs fi mkswapfile --size "${SWAPFILE_SIZE}" /mnt${BTRFS_SWAP_MNT}/swapfile
-    swapon /mnt${BTRFS_SWAP_MNT}/swapfile
+    mkdir -vp /mnt${SWAP_MNT}
+    mount -vo ${NOCOW_MNT_OPTS},subvol=${SWAP_NAME} /dev/mapper/crypt /mnt${SWAP_MNT}
+    chattr -V +C /mnt${SWAP_MNT}
+    btrfs fi mkswapfile --size "${SWAPFILE_SIZE}" /mnt${SWAP_MNT}/swapfile
+    swapon /mnt${SWAP_MNT}/swapfile
 
     # verify
     "${INTERACTIVE_MODE}" && \
