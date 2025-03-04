@@ -42,6 +42,7 @@ SYSTEMD_STARTUPS=(
     NetworkManager
     bluetooth
     reflector
+    gdm
 )
 
 HOOKS=(
@@ -60,6 +61,38 @@ HOOKS=(
     resume
     fsck
 )
+
+BTRFS_SU_ROOT="@"
+
+BTRFS_SWAP_NAME="@swap"
+BTRFS_SWAP_MNT="/.swapvol"
+
+BTRFS_SU_COW_NAME=(
+    @home
+    @snapshots
+)
+BTRFS_SU_COW_MNT=(
+    /home
+    /.snapshots
+)
+
+BTRFS_SU_NOCOW_NAME=(
+    @var_log
+    @var_cache
+    @var_tmp
+    @docker
+    @libvirt
+)
+BTRFS_SU_NOCOW_MNT=(
+    /var/log
+    /var/cache
+    /var/tmp
+    /var/lib/docker
+    /var/lib/libvirt/images
+)
+
+BTRFS_COW_MNT_OPTS="noatime,nodiratime,compress=zstd:3"
+BTRFS_NOCOW_MNT_OPTS="noatime,nodiratime,compress=no"
 
 # ------------------------------------------------
 #   Packages
@@ -130,6 +163,7 @@ BASIC_PACKAGES=(
     blueman                     # bluetooth
     openssh
     reflector                   # mirror
+    gdm
 )
 
 AUR_PACKAGES=(
@@ -142,9 +176,9 @@ AUR_PACKAGES=(
 #   CONFIGS
 # ------------------------------------------------
 
-HOSTS_CONF="127.0.0.1                                   localhost
-::1                                         localhost
-127.0.1.1       ${HOSTNAME}.localdomain         ${HOSTNAME}"
+HOSTS_CONF="
+127.0.0.1                                   localhost
+::1                                         localhost"
 
 INTEL_XORG_CONF='# prevent screen tearing for intel
 Section "Device"

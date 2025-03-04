@@ -1,15 +1,17 @@
 setup_luks() {
     echo ">> Setting up LUKS..."
 
-    # key derivation:
+    # password hash:
     #   - sha512
+
+    # key derivation:
     #   - argon2id
-    #   - real random
+    #   - use true random
     #   - 512 bit keysize
-    #   - 1 GB, 4 threads, 2 seconds = pbkdf
+    #   - pbkdf = 1 GB, 4 threads, 2 seconds
+
     # cipher:
     #   - aes xts mode with 64 bit plain init vector
-    #   - disable rw work queue (lower latency, higher cpu)
 
     cryptsetup luksFormat \
         --hash sha512 \
@@ -20,8 +22,6 @@ setup_luks() {
         --pbkdf-parallel 4 \
         --iter-time 2000 \
         --cipher aes-xts-plain64 \
-        --perf-no_read_workqueue \
-        --perf-no_write_workqueue \
         --type luks2 \
         --label "CRYPTROOT" \
         --verbose \
@@ -29,8 +29,6 @@ setup_luks() {
 
     cryptsetup luksOpen \
         --allow-discards \
-        --perf-no_read_workqueue \
-        --perf-no_write_workqueue \
         --persistent \
         --verbose \
         "${ROOT_PARTITION}" crypt
@@ -44,26 +42,22 @@ setup_luks() {
 setup_btrfs() {
     echo ">> Setting up BTRFS..."
 
-    MOUNT_OPTS="noatime,nodiratime,compress=zstd:3"
-    NOCOW_MOUNT_OPTS="noatime,nodiratime,compress=no"
-
     # format btrfs
     mkfs.btrfs -L ROOT /dev/mapper/crypt
 
     mount /dev/mapper/crypt /mnt
 
-    # create subvols
-    btrfs su create /mnt/@
-    btrfs su create /mnt/@home
-    btrfs su create /mnt/@snapshots
+    btrfs su create /mnt/${BTRFS_SU_ROOT}
 
-    # create nocow subvols
-    btrfs su create /mnt/@var_log
-    btrfs su create /mnt/@var_cache
-    btrfs su create /mnt/@var_tmp
-    btrfs su create /mnt/@docker
-    btrfs su create /mnt/@libvirt
-    btrfs su create /mnt/@swap
+    # create subvols for cow
+    for subvol in "${BTRFS_SU_COW_NAME[@]}"; do
+        btrfs su create /mnt/${subvol}
+    done
+
+    # create subvols for nocow
+    for subvol in "${BTRFS_SU_NOCOW_NAME[@]}"; do
+        btrfs su create /mnt/${subvol}
+    done
 
     # verify
     "${INTERACTIVE_MODE}" && \
@@ -76,34 +70,34 @@ setup_btrfs() {
     umount /mnt
 
     # mount root
-    mount -vo ${MOUNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
+    mount -vo ${BTRFS_COW_MNT_OPTS},subvol=@ /dev/mapper/crypt /mnt
 
-    # make subvols
-    mkdir -vp /mnt/{home,.snapshots,.swapvol,.btrfsroot}
-    mkdir -vp /mnt/var/{log,cache,tmp,lib/docker,lib/libvirt/images}
+    # create dir for btrfsroot
+    mkdir -vp /mnt/.btrfsroot
 
     # mount btrfs root
     mount -vo ${MOUNT_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
 
-    # mount subvols
-    mount -vo ${MOUNT_OPTS},subvol=@home            /dev/mapper/crypt   /mnt/home
-    mount -vo ${MOUNT_OPTS},subvol=@snapshots       /dev/mapper/crypt   /mnt/.snapshots
+    # cow subvols
+    for i in "${!BTRFS_SU_COW_NAME[@]}"; do
+        # make dir
+        mkdir -vp /mnt${BTRFS_SU_COW_MNT[$i]}
 
-    # mount nocow subvols
-    mount -vo ${MOUNT_OPTS},subvol=@var_log          /dev/mapper/crypt   /mnt/var/log
-    mount -vo ${MOUNT_OPTS},subvol=@var_cache        /dev/mapper/crypt   /mnt/var/cache
-    mount -vo ${MOUNT_OPTS},subvol=@var_tmp          /dev/mapper/crypt   /mnt/var/tmp
-    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@docker     /dev/mapper/crypt   /mnt/var/lib/docker
-    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@libvirt    /dev/mapper/crypt   /mnt/var/lib/libvirt/images
-    mount -vo ${NOCOW_MOUNT_OPTS},subvol=@swap       /dev/mapper/crypt   /mnt/.swapvol
+        # mount
+        mount -vo ${BTRFS_COW_MNT_OPTS},subvol=${BTRFS_SU_COW_NAME[$i]} /dev/mapper/crypt /mnt${BTRFS_COW_MNT[$i]}
+    done
+    
+    # nocow subvols
+    for i in "${!BTRFS_SU_NOCOW_NAME[@]}"; do
+        # make dir
+        mkdir -vp /mnt${BTRFS_SU_NOCOW_MNT[$i]}
 
-    # set nocow
-    chattr +C /mnt/var/log
-    chattr +C /mnt/var/cache
-    chattr +C /mnt/var/tmp
-    chattr +C /mnt/var/lib/docker
-    chattr +C /mnt/var/lib/libvirt/images
-    chattr +C /mnt/.swapvol
+        # mount
+        mount -vo ${BTRFS_NOCOW_MNT_OPTS},subvol=${BTRFS_SU_NOCOW_NAME[$i]} /dev/mapper/crypt /mnt${BTRFS_NOCOW_MNT[$i]}
+
+        # set no cow
+        chattr +C /mnt${BTRFS_NOCOW_MNT[$i]}
+    done
 
     # mount boot
     mkdir -vp /mnt/boot
@@ -118,8 +112,11 @@ setup_btrfs() {
     echo ">> Setting up SWAP file..."
 
     # create swapfile in swap subvol
-    btrfs fi mkswapfile --size "${SWAPFILE_SIZE}" /mnt/.swapvol/swapfile
-    swapon /mnt/.swapvol/swapfile
+    mkdir -vp /mnt${BTRFS_SWAP_MNT}
+    mount -vo ${BTRFS_NOCOW_MNT_OPTS},subvol=${BTRFS_SWAP_NAME} /dev/mapper/crypt /mnt${BTRFS_SWAP_MNT}
+    chattr +C /mnt${BTRFS_SWAP_MNT}
+    btrfs fi mkswapfile --size "${SWAPFILE_SIZE}" /mnt${BTRFS_SWAP_MNT}/swapfile
+    swapon /mnt${BTRFS_SWAP_MNT}/swapfile
 
     # verify
     "${INTERACTIVE_MODE}" && \
@@ -158,6 +155,7 @@ install_arch_base() {
 
     # quick dirty fix to fstab
     # remove subvolid from all (except btrfsroot where subvolid=5)
+    # subvolid is redundant
     sed -i 's/subvolid=[0-46-9][0-9]*,//g' /mnt/etc/fstab
 
     # verify
