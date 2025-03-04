@@ -179,6 +179,13 @@ rEFIND Theme - [refind-dreary fork](https://www.github.com/jhwshin/refind-dreary
 
 dotfiles - [jhwshin dotfiles](https://www.github.com/jhwshin/.dotfiles.git)
 
+## Advanced
+
+If you are dual booting two arch installs (e.g normal arch and blackarch on arch) files `/boot` may conflict and overwrite.
+
+- Create `move-vmlinuz.hook` for each kernel
+- Edit `/etc/mkinitcpio.d/linux.preset` for each kernel
+- Edit bootloader to new paths e.g `/boot/arch1/initramfs` etc...
 
 ---
 

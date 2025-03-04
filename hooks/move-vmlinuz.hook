@@ -1,0 +1,11 @@
+# /etc/pacman.d/hooks/move-vmlinuz.hook
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+
+[Action]
+Description = Moving vmlinuz to custom path.
+When = PostTransaction
+Exec = /usr/bin/mv /boot/vmlinuz-linux /boot/custom/vmlinuz-linux
