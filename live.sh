@@ -76,7 +76,7 @@ setup_btrfs() {
     mkdir -vp /mnt/.btrfsroot
 
     # mount btrfs root
-    mount -vo ${MOUNT_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
+    mount -vo ${COW_OPTS},subvolid=5               /dev/mapper/crypt   /mnt/.btrfsroot
 
     # cow subvols
     for i in "${!COW_NAME[@]}"; do

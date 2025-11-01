@@ -69,11 +69,15 @@ SWAP_MNT="/.swapvol"
 
 COW_NAME=(
     @home
+    @root
     @snapshots
+    @srv
 )
 COW_MNT=(
     /home
+    /root
     /.snapshots
+    /srv
 )
 
 NOCOW_NAME=(
